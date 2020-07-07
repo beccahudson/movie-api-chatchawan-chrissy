@@ -12,15 +12,40 @@ app.use(cors());
 // app.use(function validateBearerToken(req,rex,next){})
 
 app.get('/movie', (req, res) => {
-  const searchGenre = res.query.genre.toLowerCase();
-  const searchCountry = res.query.country.toLowerCase();
-  const searchAvg_vote = res.query.avg_vote.toLowerCase();
+  let searchType = '';
+  let searchTerm = '';
 
-  const results = dataset.filter(element => element.genre !== searchGenre);
+  const searchGenre = req.query.genre;
+  const searchCountry = req.query.country;
+  const searchAvg_vote = req.query.avg_vote;
+
+  if (req.query.genre && req.query.genre !== undefined) {
+    searchType = 'genre';
+    searchTerm = searchGenre.toLowerCase();
+  }
+  if (req.query.country && req.query.country !== undefined) {
+    searchType = 'country';
+    searchTerm = searchCountry.toLowerCase();
+  }
+  if (req.query.avg_vote && req.query.avg_vote !== undefined) {
+    searchType = 'avg_vote';
+    searchTerm = searchAvg_vote.toLowerCase();
+  }
+  console.log(`searchTerm: ${searchTerm}, searchType: ${searchType}`);
+
+  let results;
+
+  if (searchType === 'avg_vote') {
+    results = dataset.filter(element => element[searchType] >= searchTerm);
+  } else {
+    results = dataset.filter(
+      (element) => element[searchType].toLowerCase() === searchTerm
+    );
+  }
 
   res.status(200).send(results);
 });
 
-app.listen(8000, () => {
-  console.log('Listening on 8000!');
+app.listen(8080, () => {
+  console.log('Listening on 8080!');
 });
