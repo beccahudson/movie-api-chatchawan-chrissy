@@ -3,13 +3,28 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const cors = require('cors');
 const dataset = require('./movie-dataset.js');
+const { json } = require('express');
+require('dotenv').config();
+
 
 const app = express();
+
 
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors());
-// app.use(function validateBearerToken(req,rex,next){})
+app.use(function validateBearerToken(req, res, next) {
+  const authToken = req.get('Authorization');
+  const apiToken = process.env.API_TOKEN;
+  console.log(apiToken);
+  console.log('validate bearer token middleware')
+
+  if (!authToken || authToken.split(' ')[1]  !== apiToken) {
+    console.log('Im inside');
+    return res.status(401).json({error: 'Unauthorized request' });
+  }
+  next();
+});
 
 app.get('/movie', (req, res) => {
   let searchType = '';
@@ -39,7 +54,7 @@ app.get('/movie', (req, res) => {
     results = dataset.filter(element => element[searchType] >= searchTerm);
   } else {
     results = dataset.filter(
-      (element) => element[searchType].toLowerCase() === searchTerm
+      (element) => element[searchType].toLowerCase().includes(searchTerm)
     );
   }
 
