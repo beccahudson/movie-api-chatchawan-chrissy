@@ -16,48 +16,50 @@ app.use(cors());
 app.use(function validateBearerToken(req, res, next) {
   const authToken = req.get('Authorization');
   const apiToken = process.env.API_TOKEN;
-  console.log(apiToken);
-  console.log('validate bearer token middleware')
+//   console.log(apiToken);
+//   console.log('validate bearer token middleware')
 
   if (!authToken || authToken.split(' ')[1]  !== apiToken) {
-    console.log('Im inside');
+    // console.log('Im inside');
     return res.status(401).json({error: 'Unauthorized request' });
   }
   next();
 });
 
 app.get('/movie', (req, res) => {
-  let searchType = '';
-  let searchTerm = '';
+  let searchType = {genre: null, country: null, avg_vote: null};
+  let searchTerm = {genre: null, country: null, avg_vote: null};
 
   const searchGenre = req.query.genre;
   const searchCountry = req.query.country;
   const searchAvg_vote = req.query.avg_vote;
 
   if (req.query.genre && req.query.genre !== undefined) {
-    searchType = 'genre';
-    searchTerm = searchGenre.toLowerCase();
+    searchType.genre = 'genre';
+    searchTerm.genre = searchGenre.toLowerCase();
   }
   if (req.query.country && req.query.country !== undefined) {
-    searchType = 'country';
-    searchTerm = searchCountry.toLowerCase();
+    searchType.country = 'country';
+    searchTerm.country = searchCountry.toLowerCase();
   }
   if (req.query.avg_vote && req.query.avg_vote !== undefined) {
-    searchType = 'avg_vote';
-    searchTerm = searchAvg_vote.toLowerCase();
-  }
-  console.log(`searchTerm: ${searchTerm}, searchType: ${searchType}`);
-
-  let results;
-
-  if (searchType === 'avg_vote') {
-    results = dataset.filter(element => element[searchType] >= searchTerm);
-  } else {
-    results = dataset.filter(
-      (element) => element[searchType].toLowerCase().includes(searchTerm)
-    );
+    searchType.avg_vote = 'avg_vote';
+    searchTerm.avg_vote = searchAvg_vote;
   }
 
+  let results = [];
+
+  if (searchType.genre === 'genre') {
+    console.log(searchTerm.genre);
+    results.push(...dataset.filter(element => element.genre === searchTerm.genre));
+  } 
+  if (searchType.country === 'country') {
+    results.push(...dataset.filter(element => element.country.includes(searchTerm.country)));
+  } 
+  if (searchType.avg_vote === 'avg_vote') {
+    results.push(...dataset.filter(element => element[searchType.avg_vote] >= searchTerm.avg_vote));
+  } 
+  
   res.status(200).send(results);
 });
 
