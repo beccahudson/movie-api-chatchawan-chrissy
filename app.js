@@ -99,14 +99,14 @@ app.use(morgan('dev'))
 app.use(cors())
 app.use(helmet())
 
-app.use(function validateBearerToken(req, res, next) {
-  const apiToken = process.env.API_TOKEN
-  const authToken = req.get('Authorization')
-  if (!authToken || authToken.split(' ')[1] !== apiToken) {
-    return res.status(401).json({ error: 'Unauthorized request' })
-  }
-  next()
-})
+// app.use(function validateBearerToken(req, res, next) {
+//   const apiToken = process.env.API_TOKEN
+//   const authToken = req.get('Authorization')
+//   if (!authToken || authToken.split(' ')[1] !== apiToken) {
+//     return res.status(401).json({ error: 'Unauthorized request' })
+//   }
+//   next()
+// })
 
 app.get('/movie', function handleGetMovie(req, res) {
   let response = MOVIES;
@@ -132,8 +132,4 @@ app.get('/movie', function handleGetMovie(req, res) {
   res.json(response)
 })
 
-const PORT = 8080
-
-app.listen(PORT, () => {
-  console.log(`Server listening at http://localhost:${PORT}`)
-})
+module.exports = app;
