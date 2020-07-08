@@ -48,15 +48,39 @@ app.get('/movie', (req, res) => {
   }
   console.log(`searchTerm: ${searchTerm}, searchType: ${searchType}`);
 
-  let results;
+  let results = dataset;
 
-  if (searchType === 'avg_vote') {
-    results = dataset.filter(element => element[searchType] >= searchTerm);
-  } else {
-    results = dataset.filter(
-      (element) => element[searchType].toLowerCase().includes(searchTerm)
-    );
-  }
+  const ifQuery = function (queryName) {
+    if (req.query[queryName] && req.query[queryName] !== undefined) {
+      return true;
+    }
+    return false; 
+  };
+
+  const querySort = function () {
+    if (ifQuery('genre')) {
+      console.log('ifQuery Genre True');
+      
+    }
+    if (ifQuery('country')) {
+      console.log('country');
+    }
+    if (ifQuery('avg_vote')) {
+      console.log('avg_vote');
+    }
+  };
+
+  results = dataset.filter(element => element)
+
+  querySort();
+
+  // if (searchType === 'avg_vote') {
+  //   results = dataset.filter(element => element[searchType] >= searchTerm);
+  // } else {
+  //   results = dataset.filter(
+  //     (element) => element[searchType].toLowerCase().includes(searchTerm)
+  //   );
+  // }
 
   res.status(200).send(results);
 });
